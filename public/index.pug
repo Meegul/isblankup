@@ -45,8 +45,11 @@ html
             document.onload = () => {document.getElementsByTagName("input")[0].focus();};
             function checkEnter(event) {
                 if (event.keyCode === 13) {
-                    if (input.value)
-                        window.location = `http://localhost:3000/${input.value}`;
+                    if (input.value) {
+                        if (window.location.port)
+                            window.location = `http://${window.location.hostname}:${window.location.port}/${input.value}`;
+                        else window.location = `http://${window.location.hostname}/${input.value}`;
+                    }
                 }
             }
 
