@@ -1,0 +1,32 @@
+html
+    head
+        title #{site} #{text}
+        link(href="https://fonts.googleapis.com/css?family=Rubik:400,500" rel="stylesheet")
+        style.
+            body {
+                text-align: center;
+                font-family: 'Rubik', sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            a {
+                font-size: 4em;
+                font-weight 400;
+            }
+            .thicc {
+                font-size: 5em;
+                font-weight: 500;
+            }
+            @media screen and (max-width: 767px) {
+                a {
+                    font-size: 2em;
+                }
+                .thicc {
+                    font-size: 3em;
+                }
+            }
+    body
+        p 
+            a(class='thicc') #{site}
+            a #{text}

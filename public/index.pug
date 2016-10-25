@@ -1,0 +1,56 @@
+html
+    head
+        title #{site} #{text}
+        link(href="https://fonts.googleapis.com/css?family=Rubik:400,500" rel="stylesheet")
+        style.
+            body {
+                text-align: center;
+                font-family: 'Rubik', sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            p {
+                margin: 2%;
+                font-size: 4em;
+                font-weight 400;
+                width: 100%;
+            }
+            @media screen and (max-width: 767px) {
+                p {
+                    font-size: 2em;
+                }
+                input[type=text] {
+                    font-size: 2.5em;
+                }
+            }
+            .thicc {
+                font-size: 5em;
+                font-weight: 500;
+            }
+            input {
+                width: 100%;
+                height: 25%;
+                font-size: 5em;
+                font-weight: 500;
+                border: 0px solid;
+                text-align: center;
+            }
+            input:focus {
+                outline: none;
+            }
+    body
+        div
+            p Is
+            input(type="text" placeholder="Google.com" onkeydown="checkEnter(event)")
+            p up?
+        script.
+            let input = document.getElementsByTagName("input")[0];
+            document.onload = () => {document.getElementsByTagName("input")[0].focus();};
+            function checkEnter(event) {
+                if (event.keyCode === 13) {
+                    if (input.value)
+                        window.location = `http://localhost:3000/${input.value}`;
+                }
+            }
+

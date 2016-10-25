@@ -1,0 +1,16 @@
+{
+  "name": "isup",
+  "version": "1.0.0",
+  "description": "Checks if a website is up.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Meegul304",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "express": "^4.14.0",
+    "pug": "^2.0.0-beta6",
+    "request": "^2.76.0"
+  }
+}
