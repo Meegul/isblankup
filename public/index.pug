@@ -47,8 +47,8 @@ html
                 if (event.keyCode === 13) {
                     if (input.value) {
                         if (window.location.port)
-                            window.location = `http://${window.location.hostname}:${window.location.port}/${input.value}`;
-                        else window.location = `http://${window.location.hostname}/${input.value}`;
+                            window.location = `http://${window.location.hostname}:${window.location.port}/site/${input.value}`;
+                        else window.location = `http://${window.location.hostname}/site/${input.value}`;
                     }
                 }
             }
