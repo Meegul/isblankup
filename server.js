@@ -4,7 +4,7 @@ const request = require("request");
 const pug = require("pug");
 const compiledSite = pug.compileFile("public/site.pug");
 const compiledIndex = pug.compileFile("public/index.pug");
-const port = 80;
+const port = process.env.PORT || 3000;
 
 const cache = {};
 
