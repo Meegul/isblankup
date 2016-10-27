@@ -10,23 +10,39 @@ html
                 justify-content: center;
                 align-items: center;
             }
-            a {
+            p {
                 font-size: 4em;
                 font-weight 400;
             }
-            .thicc {
+            input {
+                border: 0px solid;
+                text-align: center;
                 font-size: 5em;
                 font-weight: 500;
             }
+            input:focus {
+                outline: none;
+            }
             @media screen and (max-width: 767px) {
-                a {
+                p {
                     font-size: 2em;
                 }
-                .thicc {
+                input {
                     font-size: 3em;
                 }
             }
     body
-        p 
-            a(class='thicc') #{site}
-            a #{text}
+        div
+            input(class='thicc' autofocus value=site onkeydown="checkEnter(event)")
+            p #{text}
+        script.
+            const input = document.getElementsByTagName("input")[0];
+            function checkEnter(event) {
+                if (event.keyCode === 13) {
+                    if (input.value) {
+                        if (window.location.port)
+                            window.location = `http://${window.location.hostname}:${window.location.port}/site/${input.value}`;
+                        else window.location = `http://${window.location.hostname}/site/${input.value}`;
+                    }
+                }
+            }

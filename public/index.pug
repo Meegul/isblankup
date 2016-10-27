@@ -38,11 +38,10 @@ html
     body
         div
             p Is
-            input(type="text" placeholder="Google.com" onkeydown="checkEnter(event)")
+            input(type="text" autofocus placeholder="Google.com" onkeydown="checkEnter(event)")
             p up?
         script.
-            let input = document.getElementsByTagName("input")[0];
-            document.onload = () => {document.getElementsByTagName("input")[0].focus();};
+            const input = document.getElementsByTagName("input")[0];
             function checkEnter(event) {
                 if (event.keyCode === 13) {
                     if (input.value) {
