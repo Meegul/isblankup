@@ -17,7 +17,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/site/*", (req, res) => {
-    const path = req.path.substring(6);
+    const path = req.path.substring(6).toLowerCase();
     const url = `http://${path}`;
     let cacheResult;
     if (cacheResult = checkCache(url)) { //See if we have a cached result.
