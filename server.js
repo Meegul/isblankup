@@ -16,6 +16,10 @@ app.get("/", (req, res) => {
     res.send(compiledIndex());
 });
 
+app.get("/loaderio-b0cb440182a844031c3bcadab44986bf", (req, res) => {
+        res.send("loaderio-b0cb440182a844031c3bcadab44986bf");
+});
+
 app.get("/site/*", (req, res) => {
     const path = req.path.substring(6).toLowerCase();
     const url = `http://${path}`;
@@ -43,6 +47,7 @@ app.get("/site/*", (req, res) => {
 });
 
 const checkUp = (url, callback) => {
+    
     request(url, (error, response, body) => {
         if (!error)
             callback(response.statusCode);
