@@ -5,8 +5,21 @@ const pug = require("pug");
 const compiledSite = pug.compileFile("public/site.pug");
 const compiledIndex = pug.compileFile("public/index.pug");
 const port = process.env.PORT || 3000;
-
+const cluster = require("cluster");
+const numCPUS = require("os").cpus().length;
 const cache = {};
+
+if (cluster.isMaster) {
+  console.log(`Master ${process.pid} is running`);
+
+  new Array(numCPUS).fill(0).forEach((on) => {
+    cluster.fork();
+  });
+
+  cluster.on("exit", (worker, code, signal) => {
+    console.log(`worker ${worker.process.pid} died`);
+  });
+} else {
 
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
@@ -71,4 +84,8 @@ function checkCache(url) {
             return cache[url].result;
         else return undefined;
     } else return undefined;
+}
+
+console.log(`worker ${process.pid} started!`);
+
 }
