@@ -16,7 +16,7 @@ app.get("/", (req, res) => {
     res.send(compiledIndex());
 });
 
-app.get("/loaderio-b0cb440182a844031c3bcadab44986bf", (req, res) => {
+app.get("/loaderio-b0cb440182a844031c3bcadab44986bf/", (req, res) => {
         res.send("loaderio-b0cb440182a844031c3bcadab44986bf");
 });
 
