@@ -50,7 +50,7 @@ if (cluster.isMaster) {
 			const timeCached = cache[url].time;
 			const currentTime = (new Date()).getTime();
 			//See if the cache is recent enough
-			if (currentTime - timeLastChecked <= cacheTimeout) {
+			if (currentTime - timeCached <= cacheTimeout) {
 				return cache[url].result;
 			}
 		}
@@ -70,9 +70,7 @@ if (cluster.isMaster) {
 	});
 
 	app.get('/site/:url', (req, res) => {
-		//If the user supplied 'http', don't add it.
-		//Else, add 'http://' to the front of the url
-		const url = (req.params.url.indexOf('http') !== -1) ? req.params.url : `http://${req.params.url}`;
+		const url = `http://${req.params.url}`;
 
 		//See if we have a cached result.
 		let cacheResult;

@@ -42,13 +42,14 @@ html
             input(id="site" type="text" autofocus placeholder="Google.com" onkeydown="checkEnter(event)")
             p up?
         script.
-            const input = encodeURI(document.getElementById("site").value);
+            const input = document.getElementById("site");
             function checkEnter(event) {
                 if (event.keyCode === 13) {
+                    const url = encodeURI(input.value);
                     if (input.value) {
                         if (window.location.port)
-                            window.location = `http://${window.location.hostname}:${window.location.port}/site/${input.value}`;
-                        else window.location = `http://${window.location.hostname}/site/${input.value}`;
+                            window.location = `http://${window.location.hostname}:${window.location.port}/site/${url}`;
+                        else window.location = `http://${window.location.hostname}/site/${url}`;
                     }
                 }
             }
