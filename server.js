@@ -1,12 +1,12 @@
-const express = require("express");
+const express = require('express');
 const app = express();
-const request = require("request");
-const pug = require("pug");
-const compiledSite = pug.compileFile("public/site.pug");
-const compiledIndex = pug.compileFile("public/index.pug");
-const port = process.env.PORT || 3000;
-const cluster = require("cluster");
-const numCPUS = require("os").cpus().length;
+const request = require('request');
+const pug = require('pug');
+const compiledSite = pug.compileFile('public/site.pug');
+const compiledIndex = pug.compileFile('public/index.pug');
+const port = process.env.PORT || 3001;
+const cluster = require('cluster');
+const numCPUS = require('os').cpus().length;
 const cache = {};
 
 if (cluster.isMaster) {
@@ -16,13 +16,17 @@ if (cluster.isMaster) {
 		cluster.fork();
 	});
 
-	cluster.on("exit", (worker, code, signal) => {
+	cluster.on('exit', (worker, code, signal) => {
 		console.log(`worker ${worker.process.pid} died`);
 	});
 } else {
 
 	const checkUp = (url, callback) => {
-		request(url, (error, response, body) => {
+		const options = {
+			url: url,
+			timeout: 5000, //Timeout after 5 seconds
+		};
+		request(options, (error, response, body) => {
 			if (!error) {
 				callback(response.statusCode);
 			} else {
@@ -43,7 +47,7 @@ if (cluster.isMaster) {
 		if (cache[url]) {
 			const timeLastChecked = cache[url].time;
 			const currentTime = (new Date()).getTime();
-			if (currentTime - timeLastChecked <= 60000) {//See if this was checked in the last minute.
+			if (currentTime - timeLastChecked <= 60000) { //See if this was checked in the last minute.
 				return cache[url].result;
 			} else {
 				return undefined;
@@ -57,35 +61,35 @@ if (cluster.isMaster) {
 		console.log(`Server listening on port ${port}`);
 	});
 
-	app.get("/", (req, res) => {
+	app.get('/', (req, res) => {
 		res.send(compiledIndex());
 	});
 
 	// For load-balancing tests.
-	app.get("/loaderio-446a472e12c593ff0d019385c2c47066/", (req, res) => {
-		res.send("loaderio-446a472e12c593ff0d019385c2c47066");
+	app.get('/loaderio-446a472e12c593ff0d019385c2c47066/', (req, res) => {
+		res.send('loaderio-446a472e12c593ff0d019385c2c47066');
 	});
 
-	app.get("/site/*", (req, res) => {
+	app.get('/site/*', (req, res) => {
 		const path = req.path.substring(6).toLowerCase();
 		const url = `http://${path}`;
 		let cacheResult;
 		if (cacheResult = checkCache(url)) { //See if we have a cached result.
 			console.log(`Got ${url}, code: ${cacheResult}, from cache.`);
-			const resultText = (cacheResult === 200) ? " is up." : " is down.";
+			const resultText = (cacheResult === 200) ? ' is up.' : ' is down.';
 			res.send(compiledSite({
 				site: path,
 				code: cacheResult,
-				text: resultText
+				text: resultText,
 			}));
 		} else { //We didn't have a recent enough result in the cache.
 			checkUp(url, (result) => {
 				console.log(`${url}: ${result}`);
-				const resultText = (result === 200) ? " is up." : " is down.";
+				const resultText = (result === 200) ? ' is up.' : ' is down.';
 				res.send(compiledSite({
 					site: path,
 					code: result,
-					text: resultText
+					text: resultText,
 				}));
 				cacheIt(url, result); //Save this result.
 			});
