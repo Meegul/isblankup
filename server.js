@@ -8,6 +8,7 @@ const port = process.env.PORT || 3001;
 const cluster = require('cluster');
 const numCPUS = require('os').cpus().length;
 const cache = {};
+const cacheTimeout = 60000; //Cache results timeout after 60 seconds
 
 if (cluster.isMaster) {
 	console.log(`Master ${process.pid} is running`);
@@ -35,25 +36,23 @@ if (cluster.isMaster) {
 		});
 	};
 
+	//Save the url->code key->val in the cache.
 	const cacheIt = (url, code) => {
-		const timeChecked = (new Date()).getTime();
 		cache[url] = {
-			time: timeChecked,
+			time: new Date().getTime(),
 			result: code,
 		};
 	};
 
 	const checkCache = (url) => {
+		//See if this url is in the cache
 		if (cache[url]) {
-			const timeLastChecked = cache[url].time;
+			const timeCached = cache[url].time;
 			const currentTime = (new Date()).getTime();
-			if (currentTime - timeLastChecked <= 60000) { //See if this was checked in the last minute.
+			//See if the cache is recent enough
+			if (currentTime - timeLastChecked <= cacheTimeout) {
 				return cache[url].result;
-			} else {
-				return undefined;
 			}
-		} else {
-			return undefined;
 		}
 	};
 
@@ -70,28 +69,34 @@ if (cluster.isMaster) {
 		res.send('loaderio-446a472e12c593ff0d019385c2c47066');
 	});
 
-	app.get('/site/*', (req, res) => {
-		const path = req.path.substring(6).toLowerCase();
-		const url = `http://${path}`;
+	app.get('/site/:url', (req, res) => {
+		//If the user supplied 'http', don't add it.
+		//Else, add 'http://' to the front of the url
+		const url = (req.params.url.indexOf('http') !== -1) ? req.params.url : `http://${req.params.url}`;
+
+		//See if we have a cached result.
 		let cacheResult;
-		if (cacheResult = checkCache(url)) { //See if we have a cached result.
-			console.log(`Got ${url}, code: ${cacheResult}, from cache.`);
+		if (cacheResult = checkCache(url)) {
+			//See if the cached result was code 200 (OK) to determine if the site was up.
 			const resultText = (cacheResult === 200) ? ' is up.' : ' is down.';
 			res.send(compiledSite({
-				site: path,
+				site: req.params.url,
 				code: cacheResult,
 				text: resultText,
 			}));
-		} else { //We didn't have a recent enough result in the cache.
+		//We didn't have a recent enough result in the cache.
+		} else {
+			//Check the url manually, cache the result.
 			checkUp(url, (result) => {
-				console.log(`${url}: ${result}`);
+				//Send the result. Code 200 (OK) === site is up.
 				const resultText = (result === 200) ? ' is up.' : ' is down.';
 				res.send(compiledSite({
-					site: path,
+					site: req.params.url,
 					code: result,
 					text: resultText,
 				}));
-				cacheIt(url, result); //Save this result.
+				//Save this result.
+				cacheIt(url, result);
 			});
 		}
 	});

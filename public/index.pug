@@ -31,6 +31,7 @@ html
                 font-weight: 500;
                 border: 0px solid;
                 text-align: center;
+                z-index: 1;
             }
             input:focus {
                 outline: none;
@@ -38,10 +39,10 @@ html
     body
         div
             p Is
-            input(type="text" autofocus placeholder="Google.com" onkeydown="checkEnter(event)")
+            input(id="site" type="text" autofocus placeholder="Google.com" onkeydown="checkEnter(event)")
             p up?
         script.
-            const input = document.getElementsByTagName("input")[0];
+            const input = encodeURI(document.getElementById("site").value);
             function checkEnter(event) {
                 if (event.keyCode === 13) {
                     if (input.value) {
