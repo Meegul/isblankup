@@ -1,9 +1,6 @@
 const express = require('express');
 const app = express();
 const request = require('request');
-const pug = require('pug');
-const compiledSite = pug.compileFile('public/site.pug');
-const compiledIndex = pug.compileFile('public/index.pug');
 const port = process.env.PORT || 3001;
 const cluster = require('cluster');
 const numCPUS = require('os').cpus().length;
@@ -21,7 +18,6 @@ if (cluster.isMaster) {
 		console.log(`worker ${worker.process.pid} died`);
 	});
 } else {
-
 	const checkUp = (url, callback) => {
 		const options = {
 			url: url,
@@ -60,8 +56,10 @@ if (cluster.isMaster) {
 		console.log(`Server listening on port ${port}`);
 	});
 
+	app.use(express.static('public'));
+
 	app.get('/', (req, res) => {
-		res.send(compiledIndex());
+		res.sendFile('public/index.html', { root: './' });
 	});
 
 	// For load-balancing tests.
@@ -76,23 +74,15 @@ if (cluster.isMaster) {
 		let cacheResult;
 		if (cacheResult = checkCache(url)) {
 			//See if the cached result was code 200 (OK) to determine if the site was up.
-			const resultText = (cacheResult === 200) ? ' is up.' : ' is down.';
-			res.send(compiledSite({
-				site: req.params.url,
-				code: cacheResult,
-				text: resultText,
-			}));
+			const resultText = (cacheResult === 200) ? 'up' : 'down';
+			res.send(resultText);
 		//We didn't have a recent enough result in the cache.
 		} else {
 			//Check the url manually, cache the result.
 			checkUp(url, (result) => {
 				//Send the result. Code 200 (OK) === site is up.
-				const resultText = (result === 200) ? ' is up.' : ' is down.';
-				res.send(compiledSite({
-					site: req.params.url,
-					code: result,
-					text: resultText,
-				}));
+				const resultText = (result === 200) ? 'up' : 'down';
+				res.send(resultText);
 				//Save this result.
 				cacheIt(url, result);
 			});
