@@ -12,6 +12,17 @@ document.onclick = () => {
 }
 
 input.onkeyup = (event) => {
+	//Escape from arrow keys.
+	switch (event.keyCode) {
+		case 37:
+		case 38:
+		case 39:
+		case 40:
+			return;
+			break;
+		default:
+			break;
+	}
 	//Remove the intro text if the user has something in the text box.
 	if (input.value.length > 0) {
 		intro[0].style.visibility = 'hidden';
