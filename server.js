@@ -67,8 +67,8 @@ if (cluster.isMaster) {
 		res.send('loaderio-446a472e12c593ff0d019385c2c47066');
 	});
 
-	app.get('/site/:url', (req, res) => {
-		const url = `http://${req.params.url}`;
+	app.get('/site/*', (req, res) => {
+		const url = `http://${req.url.substr(6)}`;
 
 		//See if we have a cached result.
 		let cacheResult;
