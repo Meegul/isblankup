@@ -44,7 +44,7 @@ input.onkeyup = (event) => {
 };
 
 const check = (url) => {
-	if (!url)
+	if (!url || url.contains('..'))
 		return;
 	const req = new XMLHttpRequest();
 	req.open('GET', `/site/${encodeURI(url)}`, true);
