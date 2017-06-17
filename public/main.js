@@ -1,6 +1,7 @@
 var input;
 var result;
 var intro;
+var favicon;
 //The minimum time the next request should be sent
 var nextReqTime = Number.MAX_VALUE;
 
@@ -14,8 +15,11 @@ function check(url) {
 	req.open('GET', '/site/'+ encodeURI(url), true);
 	req.onreadystatechange = function() {
 		if (req.status === 200) {
-			result.innerHTML = 'is ' +req.responseText;
+			result.innerHTML = 'is ' + req.responseText;
 			document.title = url + ' is ' + req.responseText;
+			if (req.responseText.indexOf('up') != -1) {
+				favicon.href='/up-favicon.png';
+			} else favicon.href='/down-favicon.png';
 		}
 		locked = false;
 	}
@@ -49,6 +53,7 @@ function inputHandler(event) {
 		intro[1].style.display = 'inherit';
 		result.style.display = 'none';
 		document.title = 'Is ... up?';
+		favicon.href = '/def-favicon.png';
 	}
 
 	//Reset status text on keypress
@@ -62,6 +67,7 @@ window.onload = function() {
 	input = document.getElementById('site');
 	result = document.getElementById('status');
 	intro = document.getElementsByName('intro');
+	favicon = document.getElementById('favicon');
 	input.onkeyup = function(event) { inputHandler(event) };
 	//Ensure focus is on the text box
 	document.onkeydown = input.focus;
