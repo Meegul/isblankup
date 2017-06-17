@@ -27,8 +27,8 @@ input.onkeyup = function(event) {
 		result.style.display = 'inherit';
 	} else {
 		intro[0].style.visibility = 'visible';
+		intro[0].style.display = 'inherit';
 		intro[1].style.display = 'inherit';
-		intro.forEach((item) => item.style.display = 'inherit');
 		result.style.display = 'none';
 		document.title = 'Is ... up?';
 	}
@@ -43,7 +43,7 @@ input.onkeyup = function(event) {
 function check(url) {
 	if (!url || url.indexOf('..') != -1)
 		return;
-	const req = new XMLHttpRequest();
+	var req = new XMLHttpRequest();
 	req.open('GET', '/site/'+ encodeURI(url), true);
 	req.onreadystatechange = function() {
 		if (req.status === 200) {
