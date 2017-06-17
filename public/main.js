@@ -1,15 +1,17 @@
-var lastPressed = new Date().getTime();
 var input = document.getElementById('site');
 var result = document.getElementById('status');
 var intro = document.getElementsByName('intro');
-//Like a mutex, ensures only one pending request at a time
-var locked = false;
+//The minimum time the next request should be sent
+var nextReqTime = Number.MAX_VALUE;
 
 //Ensure focus is on the text box
 document.onkeydown = input.focus;
 document.onclick = input.focus;
 
 input.onkeyup = function(event) {
+	//Delay sending a request for at least 250 ms after this keyup
+	nextReqTime = new Date().getTime() + 250;
+	
 	//Escape from arrow keys.
 	switch (event.keyCode) {
 		case 37:
@@ -36,11 +38,14 @@ input.onkeyup = function(event) {
 	//Reset status text on keypress
 	result.innerHTML = 'is ...';
 	
-	//Check the sites status.
-	check(input.value);
+	//Check the sites status in 250ms
+	window.setTimeout(function() { check(input.value); }, 250);
 };
 
 function check(url) {
+	//Ensure that this request is the most recent one
+	if (nextReqTime > new Date().getTime())
+		return;
 	if (!url || url.indexOf('..') != -1)
 		return;
 	var req = new XMLHttpRequest();
