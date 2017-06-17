@@ -1,17 +1,15 @@
-let lastPressed = new Date().getTime();
-const input = document.getElementById('site');
-const result = document.getElementById('status');
-const intro = document.getElementsByName('intro');
+var lastPressed = new Date().getTime();
+var input = document.getElementById('site');
+var result = document.getElementById('status');
+var intro = document.getElementsByName('intro');
+//Like a mutex, ensures only one pending request at a time
+var locked = false;
 
 //Ensure focus is on the text box
-document.onkeydown = () => {
-	input.focus();
-};
-document.onclick = () => {
-	input.focus();
-}
+document.onkeydown = input.focus;
+document.onclick = input.focus;
 
-input.onkeyup = (event) => {
+input.onkeyup = function(event) {
 	//Escape from arrow keys.
 	switch (event.keyCode) {
 		case 37:
@@ -19,7 +17,6 @@ input.onkeyup = (event) => {
 		case 39:
 		case 40:
 			return;
-			break;
 		default:
 			break;
 	}
@@ -43,16 +40,18 @@ input.onkeyup = (event) => {
 	check(input.value);
 };
 
-const check = (url) => {
+function check(url) {
 	if (!url || url.indexOf('..') != -1)
 		return;
 	const req = new XMLHttpRequest();
-	req.open('GET', `/site/${encodeURI(url)}`, true);
-	req.onreadystatechange = () => {
+	req.open('GET', '/site/'+ encodeURI(url), true);
+	req.onreadystatechange = function() {
 		if (req.status === 200) {
-			result.innerHTML = `is ${req.responseText}`;
-			document.title = `${url} is ${req.responseText}`;
+			result.innerHTML = 'is ' +req.responseText;
+			document.title = url + ' is ' + req.responseText;
 		}
+		locked = false;
 	}
+	req.onerror = function() { locked = false; };
 	req.send();
 };
