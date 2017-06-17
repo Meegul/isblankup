@@ -4,14 +4,23 @@ var intro;
 //The minimum time the next request should be sent
 var nextReqTime = Number.MAX_VALUE;
 
-document.onload = function() {
-	input = document.getElementById('site');
-	result = document.getElementById('status');
-	intro = document.getElementsByName('intro');
-	input.onkeyup = inputHandler;
-	//Ensure focus is on the text box
-	document.onkeydown = input.focus;
-	document.onclick = input.focus;
+function check(url) {
+	//Ensure that this request is the most recent one
+	if (nextReqTime > new Date().getTime())
+		return;
+	if (!url || url.indexOf('..') != -1)
+		return;
+	var req = new XMLHttpRequest();
+	req.open('GET', '/site/'+ encodeURI(url), true);
+	req.onreadystatechange = function() {
+		if (req.status === 200) {
+			result.innerHTML = 'is ' +req.responseText;
+			document.title = url + ' is ' + req.responseText;
+		}
+		locked = false;
+	}
+	req.onerror = function() { locked = false; };
+	req.send();
 };
 
 function inputHandler(event) {
@@ -28,6 +37,7 @@ function inputHandler(event) {
 		default:
 			break;
 	}
+
 	//Remove the intro text if the user has something in the text box.
 	if (input.value.length > 0) {
 		intro[0].style.visibility = 'hidden';
@@ -48,21 +58,12 @@ function inputHandler(event) {
 	window.setTimeout(function() { check(input.value); }, 250);
 };
 
-function check(url) {
-	//Ensure that this request is the most recent one
-	if (nextReqTime > new Date().getTime())
-		return;
-	if (!url || url.indexOf('..') != -1)
-		return;
-	var req = new XMLHttpRequest();
-	req.open('GET', '/site/'+ encodeURI(url), true);
-	req.onreadystatechange = function() {
-		if (req.status === 200) {
-			result.innerHTML = 'is ' +req.responseText;
-			document.title = url + ' is ' + req.responseText;
-		}
-		locked = false;
-	}
-	req.onerror = function() { locked = false; };
-	req.send();
+window.onload = function() {
+	input = document.getElementById('site');
+	result = document.getElementById('status');
+	intro = document.getElementsByName('intro');
+	input.onkeyup = function(event) { inputHandler(event) };
+	//Ensure focus is on the text box
+	document.onkeydown = input.focus;
+	document.onclick = input.focus;
 };
