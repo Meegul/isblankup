@@ -1,14 +1,20 @@
-var input = document.getElementById('site');
-var result = document.getElementById('status');
-var intro = document.getElementsByName('intro');
+var input;
+var result;
+var intro;
 //The minimum time the next request should be sent
 var nextReqTime = Number.MAX_VALUE;
 
-//Ensure focus is on the text box
-document.onkeydown = input.focus;
-document.onclick = input.focus;
+document.onload = function() {
+	input = document.getElementById('site');
+	result = document.getElementById('status');
+	intro = document.getElementsByName('intro');
+	input.onkeyup = inputHandler;
+	//Ensure focus is on the text box
+	document.onkeydown = input.focus;
+	document.onclick = input.focus;
+};
 
-input.onkeyup = function(event) {
+function inputHandler(event) {
 	//Delay sending a request for at least 250 ms after this keyup
 	nextReqTime = new Date().getTime() + 250;
 	
