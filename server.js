@@ -1,8 +1,9 @@
 const express = require('express');
 const app = express();
 const request = require('request');
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3002;
 const cluster = require('cluster');
+require('dotenv').load();
 const numCPUS = require('os').cpus().length;
 const cache = {};
 const cacheTimeout = 60000; //Cache results timeout after 60 seconds
@@ -18,6 +19,24 @@ if (cluster.isMaster) {
 		console.log(`worker ${worker.process.pid} died`);
 	});
 } else {
+	const sendSiteHit = (site) => {
+		const options = {
+			url: `${process.env.STATS_URL}/${site}/inc`,
+			method: 'POST',
+			body: {
+				auth: process.env.AUTH_TOKEN,
+			},
+			json: true,
+			timeout: 5000,
+		}
+		console.log(`sending site hit to ${options.url}`);
+		request(options, (error, response, body) => {
+			if (error) {
+				console.log(`error sending stats, ${error}`);
+			}
+		})
+	};
+
 	const checkUp = (url, callback) => {
 		const options = {
 			url: url,
@@ -69,6 +88,9 @@ if (cluster.isMaster) {
 
 	app.get('/site/*', (req, res) => {
 		const url = `http://${req.url.substr(6)}`;
+
+		//Send a site request hit to the stats server
+		sendSiteHit(req.url.substr(6));
 
 		//See if we have a cached result.
 		let cacheResult;
