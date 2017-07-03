@@ -19,22 +19,23 @@ if (cluster.isMaster) {
 		console.log(`worker ${worker.process.pid} died`);
 	});
 } else {
-	const sendSiteHit = (site) => {
+	const sendSiteHit = (site, code) => {
 		const options = {
 			url: `${process.env.STATS_URL}/${site}/inc`,
 			method: 'POST',
 			body: {
 				auth: process.env.AUTH_TOKEN,
+				code: code
 			},
 			json: true,
 			timeout: 5000,
-		}
+		};
 		console.log(`sending site hit to ${options.url}`);
 		request(options, (error, response, body) => {
 			if (error) {
 				console.log(`error sending stats, ${error}`);
 			}
-		})
+		});
 	};
 
 	const checkUp = (url, callback) => {
@@ -89,9 +90,6 @@ if (cluster.isMaster) {
 	app.get('/site/*', (req, res) => {
 		const url = `http://${req.url.substr(6)}`;
 
-		//Send a site request hit to the stats server
-		sendSiteHit(req.url.substr(6));
-
 		//See if we have a cached result.
 		let cacheResult;
 		if (cacheResult = checkCache(url)) {
@@ -107,6 +105,9 @@ if (cluster.isMaster) {
 				res.send(resultText);
 				//Save this result.
 				cacheIt(url, result);
+
+				//Send a site request hit to the stats server
+				sendSiteHit(req.url.substr(6), result);
 			});
 		}
 	});
