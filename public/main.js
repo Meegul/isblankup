@@ -2,6 +2,7 @@ var input;
 var result;
 var intro;
 var favicon;
+var acceptedCodes = [200, 304];
 //The minimum time the next request should be sent
 var nextReqTime = Number.MAX_VALUE;
 
@@ -14,7 +15,7 @@ function check(url) {
 	var req = new XMLHttpRequest();
 	req.open('GET', '/site/'+ encodeURI(url), true);
 	req.onreadystatechange = function() {
-		if (req.status === 200) {
+		if (acceptedCodes.indexOf(req.status) !== -1) {
 			result.innerHTML = 'is ' + req.responseText;
 			document.title = url + ' is ' + req.responseText;
 			if (req.responseText.indexOf('up') != -1) {

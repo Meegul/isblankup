@@ -7,6 +7,7 @@ require('dotenv').load();
 const numCPUS = require('os').cpus().length;
 const cache = {};
 const cacheTimeout = 60000; //Cache results timeout after 60 seconds
+const acceptedCodes = [200, 304];
 
 if (cluster.isMaster) {
 	console.log(`Master ${process.pid} is running`);
@@ -93,15 +94,15 @@ if (cluster.isMaster) {
 		//See if we have a cached result.
 		let cacheResult;
 		if (cacheResult = checkCache(url)) {
-			//See if the cached result was code 200 (OK) to determine if the site was up.
-			const resultText = (cacheResult === 200) ? 'up' : 'down';
+			//See if the cached result was (OK) to determine if the site was up.
+			const resultText = (acceptedCodes.includes(cacheResult)) ? 'up' : 'down';
 			res.send(resultText);
 		//We didn't have a recent enough result in the cache.
 		} else {
 			//Check the url manually, cache the result.
 			checkUp(url, (result) => {
-				//Send the result. Code 200 (OK) === site is up.
-				const resultText = (result === 200) ? 'up' : 'down';
+				//Send the result.
+				const resultText = (acceptedCodes.includes(result)) ? 'up' : 'down';
 				res.send(resultText);
 				//Save this result.
 				cacheIt(url, result);
