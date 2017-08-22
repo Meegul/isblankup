@@ -56,7 +56,7 @@ if (cluster.isMaster) {
 	//Save the url->code key->val in the cache.
 	const cacheIt = (url, code) => {
 		cache[url] = {
-			time: new Date().getTime(),
+			time: new Date().getTime() / 1000,
 			result: code,
 		};
 	};
@@ -65,7 +65,7 @@ if (cluster.isMaster) {
 		//See if this url is in the cache
 		if (cache[url]) {
 			const timeCached = cache[url].time;
-			const currentTime = (new Date()).getTime();
+			const currentTime = new Date().getTime() / 1000;
 			//See if the cache is recent enough
 			if (currentTime - timeCached <= cacheTimeout) {
 				return cache[url].result;
