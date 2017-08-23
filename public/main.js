@@ -22,9 +22,7 @@ function check(url) {
 				favicon.href='/up-favicon.png';
 			} else favicon.href='/down-favicon.png';
 		}
-		locked = false;
 	}
-	req.onerror = function() { locked = false; };
 	req.send();
 };
 
