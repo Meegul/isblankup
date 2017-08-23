@@ -89,7 +89,13 @@ if (cluster.isMaster) {
 	});
 
 	app.get('/site/*', (req, res) => {
-		const url = `http://${req.url.substr(6)}`;
+		const target = req.url.substring(6);
+		let url;
+		if (target.includes('http://') || target.includes('https://')) {
+			url = target;
+		} else {
+			url = `http://${target}`;
+		}
 
 		//See if we have a cached result.
 		let cacheResult;
