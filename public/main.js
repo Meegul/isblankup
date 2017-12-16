@@ -25,9 +25,10 @@ function check(url) {
 			} else { 
 				favicon.href = '/down-favicon.png';
 			}
+
+			//Prevent other requests from being sent
+			locked = false;
 		}
-		//Prevent other requests from being sent
-		locked = false;
 	};
 	req.onerror = () => { locked = false; };
 	req.send();
@@ -74,8 +75,8 @@ window.onload = function() {
 	result = document.getElementById('status');
 	intro = document.getElementsByName('intro');
 	favicon = document.getElementById('favicon');
-	input.onkeyup = (event) => { inputHandler(event); };
+	input.onkeyup = inputHandler;
 	//Ensure focus is on the text box
-	document.onkeydown = input.focus;
-	document.onclick = input.focus;
+	document.onkeydown = () => { input.focus(); };
+	document.onclick = () => { input.focus(); };
 };

@@ -13,6 +13,8 @@ const codeStrings = {
 	400: 'has a client error',
 	500: 'has a server error',
 };
+//Ignore bad certificates -- this will be dealt with in another way in the future
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
 if (cluster.isMaster) {
 	console.log(`Master ${process.pid} is running`);
@@ -47,13 +49,14 @@ if (cluster.isMaster) {
 	const checkUp = (url, callback) => {
 		const options = {
 			url,
-			timeout: 5000, //Timeout after 5 seconds
+			timeout: 10000, //Timeout after 10 seconds
 		};
 		request(options, (error, response, body) => {
 			if (!error) {
 				callback(response.statusCode);
 			} else {
-				callback(404);
+				console.error(error);
+				callback(408);
 			}
 		});
 	};
