@@ -19,7 +19,7 @@ function check(url) {
 		if (this.readyState === 4) {
 			const body = JSON.parse(req.responseText);
 			result.innerHTML = `${body.resultText} (${body.code})`;
-			document.title = `${url} ${req.responseText}`;
+			document.title = `${url} ${body.resultText}`;
 			if (req.responseText.indexOf('up') !== -1) {
 				favicon.href = '/up-favicon.png';
 			} else { 
