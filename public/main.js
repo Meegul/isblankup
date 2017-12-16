@@ -1,12 +1,12 @@
 let input, result, intro, favicon;
-const acceptedCodes = [200, 304];
 
 //The minimum time the next request should be sent
 let nextReqTime = Number.MAX_VALUE;
+let locked = false;
 
 function check(url) {
 	//Ensure that this request is the most recent one
-	if (nextReqTime > new Date().getTime()) {
+	if (locked || nextReqTime > new Date().getTime()) {
 		return;
 	}
 	if (!url || url.indexOf('..') !== -1) {
@@ -14,19 +14,22 @@ function check(url) {
 	}
 	const req = new XMLHttpRequest();
 	req.open('GET', `/site/${encodeURI(url)}`, true);
+	locked = true;
 	req.onreadystatechange = function() {
-		if (acceptedCodes.indexOf(req.status) !== -1) {
-			result.innerHTML = `is ${req.responseText}`;
-			document.title = `${url} is ${req.responseText}`;
+		if (this.readyState === 4) {
+			const body = JSON.parse(req.responseText);
+			result.innerHTML = `${body.resultText} (${body.code})`;
+			document.title = `${url} ${req.responseText}`;
 			if (req.responseText.indexOf('up') !== -1) {
 				favicon.href = '/up-favicon.png';
 			} else { 
 				favicon.href = '/down-favicon.png';
 			}
 		}
+		//Prevent other requests from being sent
 		locked = false;
 	};
-	req.onerror = function() { locked = false; };
+	req.onerror = () => { locked = false; };
 	req.send();
 }
 
