@@ -26,7 +26,7 @@ if (cluster.isMaster) {
 			method: 'POST',
 			body: {
 				auth: process.env.AUTH_TOKEN,
-				code: code
+				code,
 			},
 			json: true,
 			timeout: 5000,
@@ -41,7 +41,7 @@ if (cluster.isMaster) {
 
 	const checkUp = (url, callback) => {
 		const options = {
-			url: url,
+			url,
 			timeout: 5000, //Timeout after 5 seconds
 		};
 		request(options, (error, response, body) => {
