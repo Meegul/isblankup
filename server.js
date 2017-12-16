@@ -7,7 +7,14 @@ require('dotenv').load();
 const numCPUS = require('os').cpus().length;
 const cache = {};
 const cacheTimeout = 60000; //Cache results timeout after 60 seconds
-const acceptedCodes = [200, 304];
+const codeStrings = {
+	200: 'is up',
+	300: 'redirects',
+	400: 'has a client error',
+	500: 'has a server error',
+};
+//Ignore bad certificates -- this will be dealt with in another way in the future
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
 if (cluster.isMaster) {
 	console.log(`Master ${process.pid} is running`);
@@ -26,7 +33,7 @@ if (cluster.isMaster) {
 			method: 'POST',
 			body: {
 				auth: process.env.AUTH_TOKEN,
-				code: code
+				code,
 			},
 			json: true,
 			timeout: 5000,
@@ -41,14 +48,15 @@ if (cluster.isMaster) {
 
 	const checkUp = (url, callback) => {
 		const options = {
-			url: url,
-			timeout: 5000, //Timeout after 5 seconds
+			url,
+			timeout: 10000, //Timeout after 10 seconds
 		};
 		request(options, (error, response, body) => {
 			if (!error) {
 				callback(response.statusCode);
 			} else {
-				callback(404);
+				console.error(error);
+				callback(408);
 			}
 		});
 	};
@@ -101,15 +109,24 @@ if (cluster.isMaster) {
 		let cacheResult;
 		if (cacheResult = checkCache(url)) {
 			//See if the cached result was (OK) to determine if the site was up.
-			const resultText = (acceptedCodes.includes(cacheResult)) ? 'up' : 'down';
-			res.send(resultText);
+			const codeHundreds = parseInt(cacheResult/100)*100;
+			const resultText = codeStrings[codeHundreds];
+			res.send({
+				resultText,
+				code: cacheResult
+			});
 		//We didn't have a recent enough result in the cache.
 		} else {
 			//Check the url manually, cache the result.
 			checkUp(url, (result) => {
 				//Send the result.
-				const resultText = (acceptedCodes.includes(result)) ? 'up' : 'down';
-				res.send(resultText);
+				const codeHundreds = parseInt(result/100)*100;
+				const resultText = codeStrings[codeHundreds];
+				res.send({
+					resultText,
+					code: result
+				});
+				
 				//Save this result.
 				cacheIt(url, result);
 
