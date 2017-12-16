@@ -15,6 +15,9 @@ const codeStrings = {
 };
 //Ignore bad certificates -- this will be dealt with in another way in the future
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+//Enable getting IP of request
+app.enable('trust proxy');
+
 
 if (cluster.isMaster) {
 	console.log(`Master ${process.pid} is running`);
@@ -115,6 +118,7 @@ if (cluster.isMaster) {
 				resultText,
 				code: cacheResult
 			});
+			console.log(`Sent: { resultText: "${resultText}", code: ${cacheResult} } to ${req.ip}`);
 		//We didn't have a recent enough result in the cache.
 		} else {
 			//Check the url manually, cache the result.
@@ -126,7 +130,7 @@ if (cluster.isMaster) {
 					resultText,
 					code: result
 				});
-				
+				console.log(`Sent: { resultText: "${resultText}", code: ${result} } to ${req.ip}`);
 				//Save this result.
 				cacheIt(url, result);
 
