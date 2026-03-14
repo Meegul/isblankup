@@ -1,4 +1,5 @@
 require('dotenv').config();
+const path = require('path');
 const express = require('express');
 const cluster = require('cluster');
 const { cpus } = require('os');
@@ -129,10 +130,10 @@ if (cluster.isPrimary && !isDev) {
 
 	const app = express();
 
-	app.use(express.static('public'));
+	app.use(express.static(path.join(__dirname, 'public')));
 
 	app.get('/', (req, res) => {
-		res.sendFile('public/index.html', { root: './' });
+		res.sendFile(path.join(__dirname, 'public', 'index.html'));
 	});
 
 	app.get('/site/*', async (req, res) => {

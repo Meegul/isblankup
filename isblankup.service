@@ -1,0 +1,17 @@
+[Unit]
+Description=isblankup
+After=network.target
+
+[Service]
+Type=simple
+User=michael
+WorkingDirectory=/home/michael/Code/isblankup
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=5
+
+# Allow binding to port 80 without running as root
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+[Install]
+WantedBy=multi-user.target
